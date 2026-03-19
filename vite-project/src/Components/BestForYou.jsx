@@ -43,7 +43,7 @@ function BestForYou({products = [], addToCart, toggleFavorite, favorites = [], c
                             <div className="col" key={product.id}>
                                 <div className="card h-100 border-0 shadow-sm p-2 product-card position-relative">
                                     <i 
-                                    className={`bi ${isFavorite ? 'bi-heart-fill text-danger':'bi-heart'} position-absolute top-0 end-0 m-2 fs-5`} 
+                                    className={`bi ${isFavorite ? 'bi-heart-fill text-danger':'bi-heart text-danger'} position-absolute top-0 end-0 m-2 fs-5`} 
                                     style={{cursor: 'pointer', zIndex: 10}}
                                     onClick={() => toggleFavorite(product)}
                                     >
@@ -72,9 +72,10 @@ function BestForYou({products = [], addToCart, toggleFavorite, favorites = [], c
                                                 <span className="fw-bold text-danger fs-5">
                                                     {product.price} ₴
                                                 </span>
-                                                <i className={`bi ${isInCart?'bi-check-circle-fill text-primary':'bi-cart3 text-success'} fs-4`} 
+                                                <i className={`bi ${isInCart?'bi-check-circle-fill text-success':'bi-cart3 text-success'} fs-4`} 
                                                 style={{cursor: 'pointer'}}
-                                                onClick={() => addToCart(product)}></i>
+                                                onClick={() => addToCart(product)}>
+                                                </i>
                                             </div>
                                             <div className="mt-2 text-success" 
                                             style={{fontSize: '10px'}}>

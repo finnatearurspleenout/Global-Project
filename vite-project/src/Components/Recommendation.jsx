@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Scrollbar } from 'swiper/modules';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
+import { Link } from 'react-router-dom';
 
 const Recommendation = ({ products = [], cart = [], favorites = [], addToCart, toggleFavorite }) => {
     return (
@@ -28,42 +29,58 @@ const Recommendation = ({ products = [], cart = [], favorites = [], addToCart, t
                     const isFav = favorites.some(fav => fav.id === p.id);
                     return (
                         <SwiperSlide key={p.id}>
-                            <div className="card h-100 border-0 border-end rounded-0 p-2 product-card">
+                            <div className="product-card border-end h-100">
                                 <div className="position-relative text-center">
-                                    <img src={`/products/${p.image_url}`} 
-                                    className="img-fluid" alt="" 
-                                    style={{height: '140px', objectFit: 'contain'}} 
-                                    />
+                                    <Link to={`/product/${p.id}`}>
+                                        <img 
+                                        src={`/products/${p.image_url}`} 
+                                        className="img-fluid" 
+                                        alt="" 
+                                        style={{height:'140px',objectFit:'contain'}} 
+                                        />
+                                    </Link>
                                     <i 
-                                    className={`bi ${isFav?'bi-heart-fill text-danger':'bi-heart text-muted'} position-absolute top-0 end-0 fs-5`} 
-                                    style={{ cursor: 'pointer' }}
+                                    className={`bi ${isFav?'bi-heart-fill text-danger':'bi-heart text-danger'} position-absolute top-0 end-0 fs-5`} 
+                                    style={{cursor:'pointer'}}
                                     onClick={() => toggleFavorite(p)}
                                     ></i>
                                 </div>
-                                <div className="card-body px-1 py-2">
-                                    <p className="card-text mb-1 small text-dark" style={{height: '40px', overflow: 'hidden'}}>
+                                <div className="product-title-container mt-2">
+                                    <Link 
+                                    to={`/product/${p.id}`} 
+                                    className="product-title-text"
+                                    >
                                         {p.name}
-                                    </p>
-                                    <div className="text-muted small text-decoration-line-through">
-                                        {p.old_price} ₴
-                                    </div>
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <span className="fw-bold text-danger fs-5">
-                                            {p.price} ₴
-                                        </span>
-                                        <div onClick={() => addToCart(p)} style={{cursor: 'pointer'}}>
-                                            {inCart ? (
-                                                <i className="bi bi-check-circle-fill text-primary fs-4"></i>
-                                            ) : (
-                                                <i className="bi bi-cart3 text-success fs-4"></i>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="mt-2 text-success" style={{fontSize: '10px'}}>
-                                        <i className="bi bi-truck me-1"></i> 
-                                        Безкоштовна доставка
-                                    </div>   
+                                    </Link>
                                 </div>
+                                <span className="product-old-price">
+                                    {p.old_price > 0 ? `${p.old_price} ₴`:''}
+                                </span>
+                                <div className="product-footer">
+                                    <div className="product-price-current text-danger">
+                                        {p.price} 
+                                        <span className="currency-symbol">
+                                            ₴
+                                        </span>
+                                    </div>
+                                    <button 
+                                    className="buy-button" 
+                                    onClick={() => addToCart(p)}
+                                    >
+                                        {inCart ? (
+                                            <i className="bi bi-check-circle-fill text-success"></i>
+                                        ) : (
+                                            <i className="bi bi-cart3 text-success"></i>
+                                        )}
+                                    </button>
+                                </div>
+                                <div 
+                                className="mt-2 text-success" 
+                                style={{fontSize:'10px'}}
+                                >
+                                    <i className="bi bi-truck me-1"></i> 
+                                    Безкоштовна доставка
+                                </div>   
                             </div>
                         </SwiperSlide>
                     );

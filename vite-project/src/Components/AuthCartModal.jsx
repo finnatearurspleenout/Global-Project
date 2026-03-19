@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-const AuthCartModal = ({type, onClose, cart = [], setCart}) => {
-    if (!type) return null;
+const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFromCart, updateQuantity, favorites = [], setFavorites}) => {
+    if (!type || type === 'none') return null;
     const [authMode, setAuthMode] = useState('login');
+    const [openServices, setOpenServices] = useState({});
     const [formData, setFormData] = useState({
         firstName: '', lastName: '', email: '', 
         password: '', confirmPassword: '', country: ''
@@ -21,6 +22,13 @@ const AuthCartModal = ({type, onClose, cart = [], setCart}) => {
     const handleChange = (e) => {
         setFormData({...formData, [e.target.name]: e.target.value});
         setErrors({...errors, [e.target.name]: ''});
+    };
+
+    const toggleServices = (id) => {
+        setOpenServices(prev => ({
+            ...prev,
+            [id]: !prev[id]
+        }));
     };
 
     const handleLogin = () => {
@@ -45,10 +53,6 @@ const AuthCartModal = ({type, onClose, cart = [], setCart}) => {
             // виклик апі в майбутньому, щоб не забути
             onClose();
         }
-    };
-
-    const removeFromCart = (id) => {
-        setCart(prev => prev.filter(item => item.id !== id));
     };
     
     const handleRegister = () => {
@@ -88,7 +92,7 @@ const AuthCartModal = ({type, onClose, cart = [], setCart}) => {
         <div className="payment-modal-overlay" onClick={onClose}>
             <div 
             className="payment-modal-content p-4 text-center"
-            style={{maxWidth: '420px', maxHeight: '90vh', overflowY:'auto', position:'relative'}} 
+            style={{maxWidth: type === 'cart' || type === 'favorites'?'750px':'420px', maxHeight: '90vh', minHeight: type === 'cart' || type === 'favorites'?'400px':'auto', overflowY:'auto', position:'relative', transition: 'max-width 0.3s ease'}} 
             onClick={e => e.stopPropagation()}
             >
                 <button className="btn-close position-absolute top-0 end-0 m-3 shadow-none" onClick={onClose}></button>
@@ -247,45 +251,111 @@ const AuthCartModal = ({type, onClose, cart = [], setCart}) => {
                     </div>
                 )}
                 {type === 'cart' && (
-                    <div className="py-4">
+                    <div className="py-2">
                         {cart.length > 0 ? (
                             <div className="text-start">
                                 {cart.map(item => (
-                                    <div key={item.id} className="d-flex align-items-center mb-3 border-bottom pb-2">
-                                        <img src={`/products/${item.image_url}`} alt="" 
-                                        style={{width: '60px', height: '60px', objectFit: 'contain'}} />
-                                        <div className="ms-3 flex-grow-1">
-                                            <div className="small fw-bold">
-                                                {item.name}
+                                    <div key={item.id} className="mb-4 border-bottom pb-4 w-100">
+                                        <div className="d-flex align-items-start justify-content-between mb-3">
+                                            <div className="d-flex" style={{width: '50%'}}>
+                                                <img src={`/products/${item.image_url}`} alt="" 
+                                                style={{width: '60px', height: '60px', objectFit: 'contain'}} />
+                                                <div className="ms-3 small">
+                                                    <div>
+                                                        {item.name}
+                                                    </div>
+                                                    <div className="text-muted mt-1" 
+                                                    style={{fontSize: '11px'}}>
+                                                        Продавець: <br /> <strong>Electro Shop</strong>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="text-danger fw-bold">
-                                                {item.price} ₴
+                                            <div className="d-flex align-items-center gap-3">
+                                                <div className="d-flex align-items-center border rounded bg-white">
+                                                    <button className="btn btn-sm px-2 py-1 text-muted border-0 shadow-none" 
+                                                    onClick={() => updateQuantity(item.id, -1)} 
+                                                    disabled={item.quantity <= 1}>
+                                                        −
+                                                    </button>
+
+                                                    <input type="text" 
+                                                    className="text-center border-0 p-0" 
+                                                    value={item.quantity || 1} 
+                                                    readOnly style={{width: '35px', fontSize: '14px'}} />
+
+                                                    <button className="btn btn-sm px-2 py-1 text-primary border-0 shadow-none" 
+                                                    onClick={() => updateQuantity(item.id, 1)}>
+                                                        +
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="d-flex align-items-center">
+                                                <div className="text-end me-3">
+                                                    {item.old_price && 
+                                                        <div className="text-muted small text-decoration-line-through">
+                                                            {item.old_price*(item.quantity || 1)}
+                                                                ₴
+                                                        </div>
+                                                    }
+                                                    <div className="text-danger fw-bold fs-5 text-nowrap">
+                                                        {item.price*(item.quantity || 1)} ₴                                                         
+                                                    </div>
+                                                </div>
+                                                <button className="btn btn-link text-muted p-0" 
+                                                onClick={() => removeFromCart(item.id)}>
+                                                    <i className="bi bi-trash"></i>
+                                                </button>
                                             </div>
                                         </div>
-                                        <button 
-                                        className="btn btn-sm text-muted" 
-                                        onClick={() => removeFromCart(item.id)}
-                                        >
-                                            <i className="bi bi-trash"></i>
-                                        </button>
+                                        <div className="ms-5 ps-3">
+                                            <div className="text-dark small fw-bold mb-2 d-flex align-items-center" 
+                                            style={{cursor: 'pointer'}} 
+                                            onClick={() => toggleServices(item.id)}>
+                                                <i className={`bi bi-chevron-${openServices[item.id] ? 'up':'down'} me-2 small`}></i> 
+                                                Додаткові послуги
+                                            </div>
+                                            {openServices[item.id] && (
+                                                <div className="ps-2">
+                                                    <div className="form-check mb-1 d-flex align-items-center">
+                                                        <input className="form-check-input me-2 shadow-none" type="checkbox" id={`garant-${item.id}`} />
+                                                        <label className="form-check-label small" 
+                                                        htmlFor={`garant-${item.id}`}>
+                                                            Сервіс "3 роки гарантії"
+                                                        </label>
+                                                    </div>
+                                                    <div className="form-check d-flex align-items-center">
+                                                        <input className="form-check-input me-2 shadow-none" type="checkbox" id={`protect-${item.id}`} />
+                                                        <label className="form-check-label small" 
+                                                        htmlFor={`protect-${item.id}`}>
+                                                            Захист від пошкоджень
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
-                                <div className="mt-4 d-flex justify-content-between align-items-center">
-                                    <span className="fw-bold">
-                                        Разом:
-                                    </span>
-                                    <span className="fs-4 fw-bold text-danger">
-                                        {cart.reduce((sum, item) => sum + Number(item.price), 0)} ₴
-                                    </span>
+                                <div className="mt-4 pt-3 border-top bg-white">
+                                    <div className="d-flex justify-content-between flex-column align-items-center gap-3">
+                                        <button className="btn btn-outline-secondary fw-bold px-4 py-3 order-2 order-md-1 w-100 w-md-auto" onClick={onClose}>
+                                            Продовжити покупки
+                                        </button>                              
+                                        <div className="d-flex align-items-center rounded overflow-hidden order-1 order-md-2 w-100 w-md-auto" 
+                                        style={{backgroundColor: '#eef8f2', border: '1px solid #00a046'}}>
+                                            <span className="fs-5 fw-bold text-dark px-3 flex-grow-1 text-center">
+                                                {cart.reduce((sum, item) => sum + (Number(item.price)*(item.quantity || 1)), 0)} ₴
+                                            </span>
+                                            <button className="btn btn-success fw-bold px-4 py-3 border-0 rounded-0">
+                                                Оформити замовлення
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button className="btn btn-success w-100 mt-3 fw-bold py-2">
-                                    Оформити замовлення
-                                </button>
                             </div>
                         ) : (
-                            <div className="py-4">
+                            <div className="flex-grow-1 d-flex flex-column align-items-center justify-content-center py-4 text-center">
                                 <i className="bi bi-cart-x text-muted" 
-                                style={{fontSize: '4.5rem'}}></i>
+                                style={{fontSize: '4.5rem', opacity: 0.5}}></i>
                                 <h4 className="fw-bold mt-3">
                                     Кошик порожній
                                 </h4>
@@ -299,6 +369,63 @@ const AuthCartModal = ({type, onClose, cart = [], setCart}) => {
                                 </button>
                             </div>
                         )}
+                    </div>
+                )}
+                {type === 'favorites' && (
+                    <div className="py-2 text-start">
+                        <h4 className="fw-bold mb-4">
+                            Список бажаного
+                        </h4>
+                        {favorites.length > 0 ? (
+                            <>
+                                {favorites.map(item => {
+                                    const isInCart = cart.some(c => c.id === item.id);
+                                    return (
+                                        <div key={item.id} 
+                                        className="mb-3 border-bottom pb-3 d-flex align-items-center justify-content-between">
+                                            <div className="d-flex align-items-center" 
+                                            style={{width: '60%'}}>
+                                                <img src={`/products/${item.image_url}`} alt="" 
+                                                style={{width: '50px', height: '50px', objectFit: 'contain'}} />
+                                                <div className="ms-3">
+                                                    <div className="small fw-bold text-truncate" 
+                                                    style={{maxWidth: '250px'}}>
+                                                        {item.name}
+                                                    </div>
+                                                    <div className="text-danger fw-bold small">
+                                                        {item.price} ₴
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="d-flex gap-2">
+                                                <button className="btn btn-sm border-0 shadow-none"
+                                                onClick={() => addToCart(item)}>
+                                                    <i className={`bi ${isInCart ? 'bi-check-circle-fill text-success':'bi-cart-plus text-success'} fs-4`}></i>
+                                                </button>
+                                                <button className="btn btn-sm text-muted border-0" 
+                                                onClick={() => setFavorites(prev => prev.filter(f => f.id !== item.id))}>
+                                                    <i className="bi bi-trash fs-5"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                <button className="btn btn-outline-secondary w-100 fw-bold mt-3" 
+                                onClick={onClose}>
+                                    Продовжити перегляд
+                                </button>
+                            </>
+                        ) : 
+                            <div className="text-center py-5">
+                                <h5>
+                                    Список порожній
+                                </h5>
+                                <button className="btn btn-success mt-3" 
+                                onClick={onClose}>
+                                    На головну
+                                </button>
+                            </div>
+                        }
                     </div>
                 )}
             </div>

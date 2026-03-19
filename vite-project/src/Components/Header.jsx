@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-const Header = ({modalType, setModalType}) => {
+const Header = ({modalType, setModalType, cart = []}) => {
+    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     return (
         <header className="sticky-top" 
         style={{zIndex: 1050}}>
@@ -40,7 +41,13 @@ const Header = ({modalType, setModalType}) => {
                         <button onClick={() => setModalType('cart')}
                         className="btn d-flex align-items-center justify-content-center text-white p-2 position-relative"
                         style={{backgroundColor: '#00a046', borderRadius: '8px', width: '45px', height: '40px'}}>
-                            <i className="bi bi-cart"></i>
+                            <i className="bi bi-cart fs-5"></i>
+                            {totalItems > 0 && (
+                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-secondary"
+                                style={{fontSize: '0.65rem'}}>
+                                    {totalItems}
+                                </span>
+                            )}
                         </button>
                     </div>
                 </div>
