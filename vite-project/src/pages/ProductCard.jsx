@@ -17,7 +17,7 @@ const ProductCard = ({product, addToCart, toggleFavorite, favorites = [], cart =
                     <div className="text-center mb-2" 
                     style={{height: '160px'}}>
                         <img 
-                        src={`/products/${product.image_url.replace(' ','_')}`} 
+                        src={`/products/${(product.image_url || '').replace(/\s+/g, '_')}`} 
                         className="img-fluid h-100 object-fit-contain" 
                         alt={product.name} 
                         />

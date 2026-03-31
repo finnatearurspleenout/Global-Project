@@ -359,8 +359,80 @@ footer {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 700px) {
     .products-collapse.closing { 
         max-height: 1300px; 
+    }
+
+    .logo-img {
+        width: 140px;
+    }
+
+    .w-100-mobile {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    .mt-mobile-2 {
+        margin-top: 0.75rem !important;
+    }
+
+    .search-input-group .form-control {
+        font-size: 14px;
+        height: 38px;
+    }
+    .search-input-group .btn {
+        font-size: 14px;
+        height: 38px;
+    }
+
+    
+}
+
+@media (min-width: 992px) {
+    .search-input-group {
+        max-width: 600px;
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 991px) and (min-width: 700px) {
+    header .container.d-flex {
+        gap: 15px !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+
+    header .logo {
+        order: 1 !important;
+        margin: 0 auto 0 0 !important;
+    }
+
+    header .d-flex.gap-2.flex-shrink-0 {
+        order: 2 !important;
+        margin-left: auto !important;
+        width: auto !important;
+    }
+
+
+    header .d-flex.align-items-center.gap-3.order-md-2 {
+        order: 3 !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+        margin-top: 5px !important;
+    }
+
+    header .position-relative button {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    header .search-input-group {
+        flex-grow: 1 !important;
+        width: 100% !important;
+    }
+
+    .w-100-mobile {
+        width: 100% !important;
     }
 }

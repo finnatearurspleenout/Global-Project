@@ -48,13 +48,13 @@ const Header = ({modalType, setModalType, cart = [], products = []}) => {
         style={{zIndex: 1050}}>
             <div className="container-fluid border-bottom"
             style={{backgroundColor: '#221f1f'}}>
-                <div className="container d-flex justify-content-between align-items-center gap-4 p-3">
-                    <div className="logo flex-shrink-0">
+                <div className="container d-flex flex-wrap align-items-center justify-content-between p-3 gap-md-4 gap-2">
+                    <div className="logo flex-shrink-0 order-1 me-md-auto">
                         <Link to="/">
-                            <img src="/myLogo.png" alt="logo" style={{width: '200px'}}/>
+                            <img src="/myLogo.png" className="logo-img" alt="logo" style={{width: '100%', maxWidth: '200px'}}/>
                         </Link>
                     </div>
-                    <div className="d-flex flex-grow-1 align-items-center gap-3">
+                    <div className="d-flex ms-md-auto align-items-center gap-3 order-md-2 order-3 w-100-mobile mt-mobile-2">
                         <div className="position-relative">
                             <button 
                             onClick={() => setModalType(modalType === 'catalog' ? null : 'catalog')}
@@ -65,7 +65,7 @@ const Header = ({modalType, setModalType, cart = [], products = []}) => {
                                 <span className="fw-bold">Каталог</span>
                             </button>
                         </div>
-                        <div className="position-relative flex-grow-1 mx-3">
+                        <div className="position-relative flex-grow-1 search-input-group">
                             <div className="input-group">
                                 <input
                                 type="text"
@@ -114,7 +114,7 @@ const Header = ({modalType, setModalType, cart = [], products = []}) => {
                             )}
                         </div>
                     </div>
-                    <div className='d-flex gap-2 flex-shrink-0 align-items-center'>
+                    <div className='d-flex gap-2 flex-shrink-0 align-items-center order-md-3 order-2'>
                         {user ? (
                             <Link to="/profile" className="btn border-0 p-1 d-flex align-items-center justify-content-center"
                             style={{border: '2px solid #00a046 !important', borderRadius: '50%', width: '42px',  height: '42px', overflow: 'hidden'}}>                                                                   
