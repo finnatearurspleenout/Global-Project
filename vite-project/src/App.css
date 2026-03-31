@@ -436,3 +436,39 @@ footer {
         width: 100% !important;
     }
 }
+
+@media (min-width: 992px) {
+    header .container.d-flex {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 30px !important;
+    }
+
+    header .logo {
+        flex-shrink: 0 !important;
+    }
+
+    header .container.d-flex > div:nth-child(2) {
+        flex-grow: 1 !important; 
+        display: flex !important;
+        align-items: center !important;
+        gap: 15px !important;
+    }
+
+    .search-input-group {
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+    }
+
+    header .search-input-group {
+        flex-grow: 1 !important;
+        width: 100% !important;
+    }
+
+    header .d-flex.gap-2.flex-shrink-0 {
+        flex-shrink: 0 !important;
+        margin-left: auto !important;
+    }
+}
