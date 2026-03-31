@@ -1,11 +1,26 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const AsideComponent = ({onLoginClick, setModalType, cartCount = 0, favCount = 0}) => {
+
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+        });
+        const {data: {subscription}} = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
     return (
         <div className="category-list mt-2 pe-3 border-end">
             <Link 
-            to="/laptops" 
+            to="/category/laptops" 
             className="nav-link category-item d-flex align-items-center p-2 rounded"
             >
             <i className="bi bi-laptop me-3 fs-5 icon-default"></i>
@@ -14,16 +29,16 @@ const AsideComponent = ({onLoginClick, setModalType, cartCount = 0, favCount = 0
                 </span>
             </Link>
             <Link 
-            to="/computers" 
+            to="/category/computers" 
             className="nav-link category-item d-flex align-items-center p-2 rounded mt-1"
             >
             <i className="bi bi-pc-display me-3 fs-5 icon-default"></i>
                 <span>
-                    Комп'ютери
+                    Ігрові ПК
                 </span>
             </Link>
             <Link 
-            to="/components" 
+            to="/category/components" 
             className="nav-link category-item d-flex align-items-center p-2 rounded mt-1"
             >
             <i className="bi bi-cpu me-3 fs-5 icon-default"></i>
@@ -32,7 +47,7 @@ const AsideComponent = ({onLoginClick, setModalType, cartCount = 0, favCount = 0
                 </span>
             </Link>
             <Link 
-            to="/peripherals" 
+            to="/category/peripherals" 
             className="nav-link category-item d-flex align-items-center p-2 rounded mt-1"
             >
             <i className="bi bi-headphones me-3 fs-5 icon-default"></i>
@@ -42,7 +57,7 @@ const AsideComponent = ({onLoginClick, setModalType, cartCount = 0, favCount = 0
             </Link>
             <hr className="my-3 text-muted" />
             <Link 
-            to="/sales" 
+            to="/category/sales" 
             className="nav-link category-item d-flex align-items-center p-2 rounded"
             >
             <i className="bi bi-percent me-3 fs-5"></i>
@@ -51,19 +66,21 @@ const AsideComponent = ({onLoginClick, setModalType, cartCount = 0, favCount = 0
                 </span>
             </Link>
             <hr className="my-3 text-muted" />
-            <div 
-            className="p-3 mt-4 text-center border-0" 
-            style={{backgroundColor:'#f5f5f5',borderRadius:'8px'}}
-            >
-                <p style={{fontSize:'13px',color:'#212121',lineHeight:'1.4'}} >             
-                    Увійдіть, щоб отримувати рекомендації, персональні бонуси і знижки.
-                </p>
-                <button className="btn w-100 fw-bold py-2 mt-2" 
-                style={{backgroundColor:'#00a046',color:'white',borderRadius:'8px',fontSize:'14px'}}
-                onClick={onLoginClick} >    
-                    Увійдіть в особистий кабінет
-                </button>
-            </div>
+            {!user && (
+                <div 
+                className="p-3 mt-4 text-center border-0" 
+                style={{backgroundColor:'#f5f5f5',borderRadius:'8px'}}
+                >
+                    <p style={{fontSize:'13px',color:'#212121',lineHeight:'1.4'}} >             
+                        Увійдіть, щоб отримувати рекомендації, персональні бонуси і знижки.
+                    </p>
+                    <button className="btn w-100 fw-bold py-2 mt-2" 
+                    style={{backgroundColor:'#00a046',color:'white',borderRadius:'8px',fontSize:'14px'}}
+                    onClick={onLoginClick} >    
+                        Увійдіть в особистий кабінет
+                    </button>
+                </div>
+            )}
             <div 
             className="nav-link category-item d-flex align-items-center p-2 rounded mt-3"
             style={{cursor:'pointer'}}

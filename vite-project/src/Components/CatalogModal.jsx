@@ -12,26 +12,26 @@ const CatalogModal = ({type, onClose}) => {
                         <div className="col text-start">
                             <h6 className="fw-bold mb-3 d-flex align-items-center">
                                 <i className="bi bi-laptop me-2 text-success"></i> 
-                                Ноутбуки та комп'ютери
+                                Ноутбуки та компютери
                             </h6>
                             <ul className="list-unstyled small">
                                 <li className="mb-2">
-                                    <Link to="/laptops" 
+                                    <Link to="/category/laptops" 
                                     onClick={onClose} 
                                     className="catalog-link">Ноутбуки</Link>
                                 </li>
                                 <li className="mb-2">
-                                    <Link to="/gaming-pc" 
+                                    <Link to="/category/computers" 
                                     onClick={onClose} 
-                                    className="catalog-link">Ігрові комп'ютери</Link>
+                                    className="catalog-link">Ігрові ПК</Link>
                                 </li>
                                 <li className="mb-2">
-                                    <Link to="/monitors" 
+                                    <Link to="/category/monitors" 
                                     onClick={onClose} 
                                     className="catalog-link">Монітори</Link>
                                 </li>
                                 <li className="mb-2">
-                                    <Link to="/components" 
+                                    <Link to="/category/components" 
                                     onClick={onClose}
                                     className="catalog-link">Комплектуючі</Link>
                                 </li>
@@ -44,12 +44,12 @@ const CatalogModal = ({type, onClose}) => {
                             </h6>
                             <ul className="list-unstyled small">
                                 <li className="mb-2">
-                                    <Link to="/phones" 
+                                    <Link to="/category/smartphones" 
                                     onClick={onClose} 
                                     className="catalog-link">Смартфони</Link>
                                 </li>
                                 <li className="mb-2">
-                                    <Link to="/tablets" 
+                                    <Link to="/category/tablets" 
                                     onClick={onClose} 
                                     className="catalog-link">Планшети</Link>
                                 </li>
@@ -62,14 +62,19 @@ const CatalogModal = ({type, onClose}) => {
                             </h6>
                             <ul className="list-unstyled small">
                                 <li className="mb-2">
-                                    <Link to="/consoles" 
+                                    <Link to="/category/consoles" 
                                     onClick={onClose} 
                                     className="catalog-link">Приставки</Link>
                                 </li>
                                 <li className="mb-2">
-                                    <Link to="/games" 
+                                    <Link to="/category/games" 
                                     onClick={onClose} 
                                     className="catalog-link">Ігри</Link>
+                                </li>
+                                <li className="mb-2">
+                                    <Link to="/category/peripherals" 
+                                    onClick={onClose} 
+                                    className="catalog-link">Периферія та аксесуари</Link>
                                 </li>
                             </ul>
                         </div>

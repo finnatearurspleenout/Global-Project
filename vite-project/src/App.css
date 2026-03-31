@@ -1,4 +1,14 @@
 
+#root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-container {
+    flex: 1 0 auto;
+}
+
 /* header catalog */
 
 .catalog-overlay {
@@ -219,6 +229,10 @@
 }
 
 /* footer */
+
+footer {
+    flex-shrink: 0;
+}
 
 .footer .list-unstyled a {
     transition: color 0.2s ease-in-out;

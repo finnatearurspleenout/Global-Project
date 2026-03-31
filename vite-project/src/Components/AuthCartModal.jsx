@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
+import toast from 'react-hot-toast';
 
 const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFromCart, updateQuantity, favorites = [], setFavorites}) => {
+    const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+
     if (!type || type === 'none') return null;
     const [authMode, setAuthMode] = useState('login');
+    const [isRegistered, setIsRegistered] = useState(false);
     const [openServices, setOpenServices] = useState({});
     const [formData, setFormData] = useState({
         firstName: '', lastName: '', email: '', 
@@ -10,6 +17,18 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
     });
 
     const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({data: {session}}) => {
+            setUser(session?.user ?? null);
+        });
+
+        const {data: {subscription}} = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     useEffect(() => {
         if (type === 'login' || type === 'register') {
@@ -24,6 +43,39 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
         setErrors({...errors, [e.target.name]: ''});
     };
 
+    // const handlePlaceOrder = async () => {
+    //     if (!user) {
+    //         toast.error('Будь ласка, увійдіть в акаунт, щоб оформити замовлення');
+    //         setAuthMode('login');
+    //         return;
+    //     }
+
+    //     if (cart.length === 0) {
+    //         toast.error('Ваш кошик порожній');
+    //         return;
+    //     }
+
+    //     const cartTotal = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+
+    //     const orderData = {
+    //         user_id: user.id,
+    //         items: cart,
+    //         total_price: cartTotal,
+    //         status: 'Новий',
+    //         created_at: new Date()
+    //     };
+
+    //     const {error} = await supabase.from('orders').insert([orderData]);
+
+    //     if (!error) {
+    //         toast.success('Замовлення успішно прийнято!');
+    //         setCart([]);
+    //         onClose();
+    //     } else {
+    //         toast.error('Помилка збереження: ' + error.message);
+    //     }
+    // };
+
     const toggleServices = (id) => {
         setOpenServices(prev => ({
             ...prev,
@@ -31,7 +83,7 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
         }));
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         const loginErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -49,13 +101,21 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
             setErrors(loginErrors);
         }
         else {
-            console.log('Вхід дозволено', formData.email);
-            // виклик апі в майбутньому, щоб не забути
-            onClose();
+            const {error} = await supabase.auth.signInWithPassword({
+                email: formData.email,
+                password: formData.password,
+            });
+
+            if (error) {
+                setErrors({auth: 'Невірний email або пароль'}); 
+            } 
+            else {
+                onClose(); 
+            }
         }
     };
     
-    const handleRegister = () => {
+    const handleRegister = async () => {
         const newErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const passwordRegex = /^[a-zA-Z0-9!@#$%^&*\.\-]+$/;
@@ -83,8 +143,26 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
             setErrors(newErrors);
         } 
         else {
-            console.log('Реєстрація успішна', formData);
-            onClose();
+            const {error} = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+                options: {
+                    data: {
+                        first_name: formData.firstName,
+                        last_name: formData.lastName,
+                        country: formData.country
+                    }
+                }
+            });
+            if (error) {
+                setErrors({auth: error.message || 'Помилка при реєстрації'});
+            } 
+            else {
+                console.log('Реєстрація успішна');
+                setIsRegistered(true);
+                setFormData({firstName: '', lastName: '', email: '', password: '', confirmPassword: '', country: ''});
+                onClose();
+            }
         }
     };
 
@@ -95,8 +173,17 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
             style={{maxWidth: type === 'cart' || type === 'favorites'?'750px':'420px', maxHeight: '90vh', minHeight: type === 'cart' || type === 'favorites'?'400px':'auto', overflowY:'auto', position:'relative', transition: 'max-width 0.3s ease'}} 
             onClick={e => e.stopPropagation()}
             >
-                <button className="btn-close position-absolute top-0 end-0 m-3 shadow-none" onClick={onClose}></button>
-                {type === 'login' && (
+                {isRegistered ? (
+                    <div className="py-5 text-center">
+                        <i className="bi bi-envelope-check text-success" style={{fontSize: '4rem'}}></i>
+                        <h3 className="fw-bold mt-3">Реєстрація успішна!</h3>
+                        <p className="text-muted">
+                            Ми відправили лист на <strong>{formData.email}</strong>.<br />
+                            Будь ласка, підтвердіть пошту, щоб увійти в акаунт.
+                        </p>
+                        <button className="btn btn-success px-5 mt-3" onClick={onClose}>Зрозуміло</button>
+                    </div>
+                ) : type === 'login' && (               
                     <div className="py-3">
                         <h3 className="fw-bold mb-4">
                             {authMode === 'login' ? 'Вхід' : 'Реєстрація'}
@@ -127,6 +214,11 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
                                     />
                                     {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                                 </div>
+                                {errors.auth && (
+                                    <div className="alert alert-danger py-2 small text-center" role="alert">
+                                        {errors.auth}
+                                    </div>
+                                )}
                                 <button 
                                 onClick={handleLogin}
                                 className="btn w-100 text-white fw-bold py-2 mb-3" 
@@ -226,6 +318,11 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
                                     />
                                     {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
                                 </div>
+                                {errors.auth && (
+                                    <div className="alert alert-danger py-2 small text-center" role="alert">
+                                        {errors.auth}
+                                    </div>
+                                )}
                                 <button 
                                 onClick={handleRegister} 
                                 className="btn w-100 text-white fw-bold py-2 mb-3" 
@@ -273,7 +370,7 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
                                             <div className="d-flex align-items-center gap-3">
                                                 <div className="d-flex align-items-center border rounded bg-white">
                                                     <button className="btn btn-sm px-2 py-1 text-muted border-0 shadow-none" 
-                                                    onClick={() => updateQuantity(item.id, -1)} 
+                                                    onClick={() => updateQuantity(item.id, (item.quantity || 1)-1)} 
                                                     disabled={item.quantity <= 1}>
                                                         −
                                                     </button>
@@ -284,7 +381,7 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
                                                     readOnly style={{width: '35px', fontSize: '14px'}} />
 
                                                     <button className="btn btn-sm px-2 py-1 text-primary border-0 shadow-none" 
-                                                    onClick={() => updateQuantity(item.id, 1)}>
+                                                    onClick={() => updateQuantity(item.id, (item.quantity || 1)+1)}>
                                                         +
                                                     </button>
                                                 </div>
@@ -345,7 +442,12 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
                                             <span className="fs-5 fw-bold text-dark px-3 flex-grow-1 text-center">
                                                 {cart.reduce((sum, item) => sum + (Number(item.price)*(item.quantity || 1)), 0)} ₴
                                             </span>
-                                            <button className="btn btn-success fw-bold px-4 py-3 border-0 rounded-0">
+                                            <button 
+                                            className="btn btn-success fw-bold px-4 py-3 border-0 rounded-0"
+                                            onClick={() => {
+                                                onClose();
+                                                navigate('/checkout');
+                                            }}>
                                                 Оформити замовлення
                                             </button>
                                         </div>
