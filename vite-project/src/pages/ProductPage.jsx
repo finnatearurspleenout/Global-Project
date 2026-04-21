@@ -7,6 +7,7 @@ const ProductPage = ({products, addToCart, toggleFavorite, favorites, cart}) => 
     const {productId} = useParams();
     const navigate = useNavigate();
     const product = products.find(p => String(p.id) === String(productId));
+    const similarProductsCount = 4;
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -15,7 +16,7 @@ const ProductPage = ({products, addToCart, toggleFavorite, favorites, cart}) => 
     useEffect(() => {
         if (product) {
             const viewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
-            const updated = [product, ...viewed.filter(p => p.id !== product.id)].slice(0, 4);
+            const updated = [product, ...viewed.filter(p => p.id !== product.id)].slice(0, similarProductsCount);
             localStorage.setItem('recentlyViewed', JSON.stringify(updated));
         }
     }, [product]);
@@ -25,7 +26,7 @@ const ProductPage = ({products, addToCart, toggleFavorite, favorites, cart}) => 
         return products
         .filter(p => p.category === product.category && p.id !== product.id)
         .sort(() => Math.random()-0.5)
-        .slice(0, 4);
+        .slice(0, similarProductsCount);
     }, [productId, products, product?.category]);
 
     if(!product) {
@@ -38,7 +39,7 @@ const ProductPage = ({products, addToCart, toggleFavorite, favorites, cart}) => 
 
         <div className="container mt-4 mb-5">
             <button 
-            className="btn btn-outline-secondary mb-4 border-0" 
+            className="btn btn-outline-secondary mb-4 border-0 ps-0" 
             onClick={() => navigate(-1)}>
                 <i className="bi bi-arrow-left"></i> 
                     Назад

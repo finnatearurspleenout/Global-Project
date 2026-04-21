@@ -24,6 +24,7 @@ import Terms from './pages/FooterPages/Terms';
 import Warranty from './pages/FooterPages/Warranty';
 import { Toaster } from 'react-hot-toast';
 import Profile from './pages/Profile';
+import NotFound from './pages/NotFound';
 
 function App() {
   const [modalType, setModalType] = useState(null);
@@ -208,6 +209,7 @@ function App() {
                   <Route path="/delivery" element={<Delivery />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/warranty" element={<Warranty />} />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>   
               </div>
             </div>

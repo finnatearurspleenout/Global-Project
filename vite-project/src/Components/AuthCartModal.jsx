@@ -158,7 +158,6 @@ const AuthCartModal = ({type, onClose, cart = [], addToCart, setCart, removeFrom
                 setErrors({auth: error.message || 'Помилка при реєстрації'});
             } 
             else {
-                console.log('Реєстрація успішна');
                 setIsRegistered(true);
                 setFormData({firstName: '', lastName: '', email: '', password: '', confirmPassword: '', country: ''});
                 onClose();

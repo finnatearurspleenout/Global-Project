@@ -8,6 +8,11 @@ const CheckoutPage = ({cart = [], updateQuantity, setCart}) => {
     const [form, setForm] = useState({name: '', surname: '', phone: '', address: '', payment: 'card'});
     const [errors, setErrors] = useState({name: false, surname: false, phone: false, address: false});
     const [showSuccess, setShowSuccess] = useState(false);
+    
+    const phoneRegex = /^\+380\d{9}$/;
+    const minName = 2;
+    const minAddr = 3;
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,20 +28,20 @@ const CheckoutPage = ({cart = [], updateQuantity, setCart}) => {
         const newForm = {...form, [name]: finalValue};
         setForm(newForm);
 
-        setErrors({
-            ...errors,
-            name: newForm.name.length > 0 && newForm.name.trim().length < 2,
-            surname: newForm.surname.length > 0 && newForm.surname.trim().length < 2,
-            phone: newForm.phone.replace(/\D/g, '').length > 0 && newForm.phone.replace(/\D/g, '').length < 10,
-            address: newForm.address.length > 0 && newForm.address.trim().length < 3
-        });
+        setErrors(prevErrors => ({
+            ...prevErrors,
+            name: name === 'name' ? (finalValue.length > 0 && finalValue.trim().length < minName) : prevErrors.name,
+            surname: name === 'surname' ? (finalValue.length > 0 && finalValue.trim().length < minName) : prevErrors.surname,
+            phone: name === 'phone' ? (finalValue.length > 0 && !phoneRegex.test(finalValue)) : prevErrors.phone,
+            address: name === 'address' ? (finalValue.length > 0 && finalValue.trim().length < minAddr) : prevErrors.address
+        }));
     };
 
     const isFormInvalid = 
-        form.name.trim().length < 2 || 
-        form.surname.trim().length < 2 || 
-        form.phone.replace(/\D/g, '').length < 10 || 
-        form.address.trim().length < 3;
+        form.name.trim().length < minName || 
+        form.surname.trim().length < minName || 
+        !phoneRegex.test(form.phone) || 
+        form.address.trim().length < minAddr;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -52,6 +57,11 @@ const CheckoutPage = ({cart = [], updateQuantity, setCart}) => {
             address: form.address,
             phone: form.phone
         };
+
+        if (!phoneRegex.test(form.phone)) {
+            toast.error("Формат телефону: +380XXXXXXXXX");
+            return;
+        }
 
         const {error} = await supabase.from('orders').insert([orderData]);
 
@@ -148,7 +158,7 @@ const CheckoutPage = ({cart = [], updateQuantity, setCart}) => {
                                 {cart.map(item => (
                                     <div key={item.id} className="d-flex align-items-center mb-3 pb-3 border-bottom text-dark">
                                         <img 
-                                        src={`/products/${item.image_url.replace(' ','_')}`} 
+                                        src={`/products/${item.image_url.replace(/\s+/g, '_')}`} 
                                         alt={item.name} 
                                         className="rounded me-3" 
                                         style={{width: '50px', height: '50px', objectFit: 'contain'}} 

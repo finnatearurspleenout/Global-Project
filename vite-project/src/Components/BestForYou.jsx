@@ -4,10 +4,15 @@ import { Link } from 'react-router-dom';
 function BestForYou({products = [], addToCart, toggleFavorite, favorites = [], cart = []}) {
     const [visibility, setVisibility] = useState(6);
     const [isClosing, setIsClosing] = useState(false);
-    
+
+    const initialVisibility = 6;
+    const loadMoreStep = 6;
+    const scrollDelay = 100;
+    const collapseDelay = 900;
+
     function loadMore() {
         if (visibility < products.length) {
-            setVisibility(prevValue => prevValue + 6);
+            setVisibility(prevValue => prevValue + loadMoreStep);
         } 
         else {
             setIsClosing(true);
@@ -15,15 +20,15 @@ function BestForYou({products = [], addToCart, toggleFavorite, favorites = [], c
                 const titleElement = document.getElementById('best-for-you-title');
                 if (titleElement) {
                     window.scrollTo({
-                        top: titleElement.offsetTop - 100, 
+                        top: titleElement.offsetTop - scrollDelay, 
                         behavior: 'smooth' 
                     });
                 }
-            }, 100);
+            }, scrollDelay);
             setTimeout(() => {
-                setVisibility(6); 
+                setVisibility(initialVisibility); 
                 setIsClosing(false);
-            }, 900);
+            }, collapseDelay);
         }
     }
     const displayedProducts = products.slice(0, visibility);

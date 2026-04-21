@@ -15,6 +15,8 @@ const BestProduct = () => {
         {id: 2, title: 'Iphone',image: '/iphone17-banner.png', link: '/product/554'},
         {id: 3, title: 'Samsung',image: '/samsung-banner.png', link: '/product/555'}
     ];
+
+    const promoDelay = 4000;
     return (
         <main className="promo-slider-section">
             <div className='container-fluid px-0'>
@@ -23,7 +25,7 @@ const BestProduct = () => {
                     spaceBetween={0}
                     loop={true}
                     autoplay={{
-                        delay: 4000,
+                        delay: promoDelay,
                         disableOnInteraction: false,
                     }}
                     pagination={{ clickable: true }}
